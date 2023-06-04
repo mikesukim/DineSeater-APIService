@@ -51,3 +51,5 @@ Thumbs.db
 # ZIP file
 *zip
 
+# Deploy file
+deploy.sh
