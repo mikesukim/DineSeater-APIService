@@ -34,3 +34,6 @@ def service_unavailable(body: dict) -> dict:
 
 def gateway_timeout(body: dict) -> dict:
     return response(HTTPStatus.GATEWAY_TIMEOUT, body)
+
+def bad_request(body: dict) -> dict:
+    return response(HTTPStatus.BAD_REQUEST, body)
