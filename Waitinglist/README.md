@@ -1,9 +1,11 @@
-# Pre Token Generation Trigger
+# Waitinglist API
 
 ## Background
+The Waitinglist API can only be accessed through AWS Lambda via API Gateway. It supports HTTP requests for both GET and POST methods.
 
 ## Requirement
 - python version 3.10
+## Requirement for deployment
 - [aws-cli](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 
 ## Deployment
@@ -25,8 +27,6 @@ zip -r lambda_function.zip lambda_function.py tests
 4. Deploy the zip file
 ```bash
 aws lambda update-function-code \
-    --function-name DineSeater-Test-CognitoPreTokenGenerationTrigger \
+    --function-name DineSeater-<stage>-Waitinglist \
     --zip-file fileb://<path_to_zip_file>
 ```
-
->  Make sure Lambda function is assigned with proper IAM role. 
