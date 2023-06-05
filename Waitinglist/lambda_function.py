@@ -1,5 +1,6 @@
 import json
 import response_handler
+from dynamodb_client import DynamoDBClient
 
 def lambda_handler(event, context):
     # get business name from event (retrived from ID_TOKEN)
@@ -31,6 +32,20 @@ def lambda_handler(event, context):
                     # add customer to waitinglist
                     # add customer to dynamodb
                     print("Add customer to waitinglist")
+                    table_name = 'DineSeater-Waitinglist'
+                    dynamodb_client = DynamoDBClient(table_name)
+
+                    # Example usage
+                    business_name = 'example_business'
+                    number_of_customers = 5
+                    detail_attribute = {"someKey": "someValue"}
+
+                    # Create waiting
+                    new_waiting = dynamodb_client.create_waiting(business_name, number_of_customers, detail_attribute)
+                    print("Created new waiting: " + json.dumps(new_waiting))
+
+                    # publish sns message
+
                 case 'remove':
                     # remove customer from waitinglist
                     # remove customer from dynamodb
