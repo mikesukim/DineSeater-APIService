@@ -32,7 +32,7 @@ post_request_event = {
 }
 
 post_add_request_event = {
-    "body": "{\"action\": \"add\"}",
+    "body": "{\"action\": \"add\", \"number_of_customers\": 2, \"detail_attribute\": {\"is_meal\": true, \"is_grill\": true}}",
     "resource": "/your-resource",
     "path": "/your-path",
     "httpMethod": "POST",

@@ -36,10 +36,18 @@ def lambda_handler(event, context):
                     # add waiting to dynamodb
                     print("Add customer to waitinglist")
 
-                    # Example usage
-                    business_name = 'example_business'
-                    number_of_customers = 5
-                    detail_attribute = {"someKey": "someValue"}
+                    # get attributes from body   
+                    number_of_customers = None
+                    detail_attribute = None
+                    try:
+                        number_of_customers = get_number_of_customers(event)
+                        detail_attribute =  get_detail_attribute(event)
+                        if business_name == 'gilson' :
+                            get_table_type(detail_attribute)
+                    except Exception as e:
+                        error_message = 'Error getting attributes: ' + str(e)
+                        print(error_message)
+                        return response_handler.bad_request({"message": error_message})
 
                     # Create waiting
                     new_waiting = dynamodb_client.create_waiting(business_name, number_of_customers, detail_attribute)
@@ -85,3 +93,24 @@ def get_action(event):
     if action == None:
         raise Exception('Action not found')
     return action.lower()
+
+def get_number_of_customers(event):
+    body = json.loads(event['body'])
+    number_of_customers = body['number_of_customers']
+    if number_of_customers == None:
+        raise Exception('number_of_customers not found')
+    return number_of_customers
+
+def get_detail_attribute(event):
+    body = json.loads(event['body'])
+    detail_attribute = body['detail_attribute']
+    if detail_attribute == None:
+        raise Exception('detail_attribute not found')
+    return detail_attribute
+
+def get_table_type(detail_attribute):
+    is_meal = detail_attribute['is_meal']
+    is_grill = detail_attribute['is_grill']
+    if is_meal == None or is_grill == None:
+        raise Exception('table_type not found')
+    return (is_meal, is_grill)
