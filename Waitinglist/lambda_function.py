@@ -2,6 +2,9 @@ import json
 import response_handler
 from dynamodb_client import DynamoDBClient
 
+# Global variable to make singleton within a container.
+dynamodb_client = DynamoDBClient('DineSeater-Waitinglist')
+
 def lambda_handler(event, context):
     # get business name from event (retrived from ID_TOKEN)
     business_name = None
@@ -27,13 +30,11 @@ def lambda_handler(event, context):
                 error_message = 'Error getting action: ' + str(e)
                 print(error_message)
                 return response_handler.bad_request({"message": "Action not found"})
-            match action.lower():
+            match action :
                 case 'add':
                     # add customer to waitinglist
-                    # add customer to dynamodb
+                    # add waiting to dynamodb
                     print("Add customer to waitinglist")
-                    table_name = 'DineSeater-Waitinglist'
-                    dynamodb_client = DynamoDBClient(table_name)
 
                     # Example usage
                     business_name = 'example_business'
@@ -48,7 +49,7 @@ def lambda_handler(event, context):
 
                 case 'remove':
                     # remove customer from waitinglist
-                    # remove customer from dynamodb
+                    # remove waiting from dynamodb
                     print("Remove customer from waitinglist")
                 case 'notify':
                     # notify customer from waitinglist
@@ -68,7 +69,7 @@ def get_business_name(event):
     business_name = get_claim(event, 'business_name')
     if business_name == None:
         raise Exception('Business name not found')
-    return business_name
+    return business_name.lower()
 
 def get_claim(event, claim_name):
     authorizer = event['requestContext'].get('authorizer')
@@ -83,4 +84,4 @@ def get_action(event):
     action = body['action']
     if action == None:
         raise Exception('Action not found')
-    return action
+    return action.lower()
