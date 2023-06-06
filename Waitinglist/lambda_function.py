@@ -55,16 +55,29 @@ def lambda_handler(event, context):
                     # Create waiting
                     new_waiting = dynamodb_client.create_waiting(business_name, number_of_customers, detail_attribute, phone_number)
                     print("Created new waiting: " + json.dumps(new_waiting))
+                
+                    # TODO: publish sns message
 
-                    # publish sns message
+                    return response_handler.success({"message": "waiting creation success " + new_waiting})
 
                 case 'remove':
                     # remove customer from waitinglist
                     # remove waiting from dynamodb
                     print("Remove customer from waitinglist")
+                    # get waiting_id from body
+                    waiting_id = None
+                    try:
+                        waiting_id = get_waiting_id(event)
+                    except Exception as e:
+                        error_message = 'Error getting waiting_id: ' + str(e)
+                        print(error_message)
+                        return response_handler.bad_request({"message": error_message})
+                    # delete waiting
+                    dynamodb_client.delete_waiting(business_name, waiting_id)
+                    return response_handler.success({"message": "waiting deletion success " + waiting_id})
                 case 'notify':
                     # notify customer from waitinglist
-                    # update dynamodb first, then perform sns publish
+                    # update dynamodb(waiting status) first, then perform sns publish
                     # publish sns message
                     print("Notify customer from waitinglist")
                 case _:
@@ -124,3 +137,10 @@ def get_phone_number(event):
     if phone_number == None:
         raise Exception('phone_number not found')
     return phone_number
+
+def get_waiting_id(event):
+    body = json.loads(event['body'])
+    waiting_id = body['waiting_id']
+    if waiting_id == None:
+        raise Exception('waiting_id not found')
+    return waiting_id
