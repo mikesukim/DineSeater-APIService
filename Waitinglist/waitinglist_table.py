@@ -18,14 +18,16 @@ class WaitingTable:
         )
         return response.get('Items', [])
     
-    def create_waiting(self, business_name, number_of_customers, detail_attribute):
+    def create_waiting(self, business_name, number_of_customers, detail_attribute, phone_number):
         waiting_id = str(uuid.uuid4())
         item = {
             'business_name': business_name,
             'waiting_id': waiting_id,
             'date_created': '2023-06-04',  # Example: Set the date_created attribute
             'number_of_customers': number_of_customers,
-            'detail_attribute': detail_attribute
+            'detail_attribute': detail_attribute,
+            'phone_number': phone_number,
+            'status': 'waiting',
         }
         self.table.put_item(Item=item)
         return item

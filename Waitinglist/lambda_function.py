@@ -30,6 +30,7 @@ def lambda_handler(event, context):
                 error_message = 'Error getting action: ' + str(e)
                 print(error_message)
                 return response_handler.bad_request({"message": "Action not found"})
+            # TODO : create a abstract class for action
             match action :
                 case 'add':
                     # add customer to waitinglist
@@ -39,9 +40,11 @@ def lambda_handler(event, context):
                     # get attributes from body   
                     number_of_customers = None
                     detail_attribute = None
+                    phone_number = None
                     try:
                         number_of_customers = get_number_of_customers(event)
                         detail_attribute =  get_detail_attribute(event)
+                        phone_number = get_phone_number(event)
                         if business_name == 'gilson' :
                             get_table_type(detail_attribute)
                     except Exception as e:
@@ -50,7 +53,7 @@ def lambda_handler(event, context):
                         return response_handler.bad_request({"message": error_message})
 
                     # Create waiting
-                    new_waiting = dynamodb_client.create_waiting(business_name, number_of_customers, detail_attribute)
+                    new_waiting = dynamodb_client.create_waiting(business_name, number_of_customers, detail_attribute, phone_number)
                     print("Created new waiting: " + json.dumps(new_waiting))
 
                     # publish sns message
@@ -114,3 +117,10 @@ def get_table_type(detail_attribute):
     if is_meal == None or is_grill == None:
         raise Exception('table_type not found')
     return (is_meal, is_grill)
+
+def get_phone_number(event):
+    body = json.loads(event['body'])
+    phone_number = body['phone_number']
+    if phone_number == None:
+        raise Exception('phone_number not found')
+    return phone_number
