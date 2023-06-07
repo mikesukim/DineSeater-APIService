@@ -24,9 +24,9 @@ class WaitingTable:
             'business_name': business_name,
             'waiting_id': waiting_id,
             'date_created': '2023-06-04',  # Example: Set the date_created attribute
-            'number_of_customers': number_of_customers,
+            'number_of_customers': int(number_of_customers),
             'detail_attribute': detail_attribute,
-            'phone_number': phone_number,
+            'phone_number': str(phone_number),
             'status': 'waiting',
         }
         self.table.put_item(Item=item)
