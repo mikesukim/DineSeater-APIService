@@ -2,6 +2,7 @@ import json
 import response_handler
 from dynamodb_client import DynamoDBClient
 from post_action_handler import PostActionHandler
+from get_handler import GetHandler
 
 # Global variable to make singleton within a container.
 dynamodb_client = DynamoDBClient('DineSeater-Waitinglist')
@@ -20,8 +21,8 @@ def lambda_handler(event, context):
     # check http Method from event
     match event['httpMethod']:
         case 'GET':
-            # get waitinglist from dynamodb
-            return response_handler.success({"message": "Hello " + business_name})
+            get_action_handler = GetHandler(event, business_name, dynamodb_client)
+            return get_action_handler.handle_action()
         
         case 'POST':
             post_action_handler = PostActionHandler(event, business_name, dynamodb_client)
