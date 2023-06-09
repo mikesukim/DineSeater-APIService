@@ -10,6 +10,9 @@ class DynamoDBClient:
     def get_waitings_by_business_name(self, business_name):
         return self.waiting_table.get_waitings_by_business_name(business_name)
     
+    def get_today_waitings_by_business_name(self, business_name):
+        return self.waiting_table.get_today_waitings(business_name)
+    
     # TODO: check data type of all attributes
     def create_waiting(self, business_name, number_of_customers, detail_attribute, phone_number):
         return self.waiting_table.create_waiting(business_name, number_of_customers, detail_attribute, phone_number)

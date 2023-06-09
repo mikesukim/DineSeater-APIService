@@ -11,7 +11,7 @@ class GetHandler:
     def handle_action(self):
         try:
             # get waitinglist from dynamodb
-            waitings = self.dynamodb_client.get_waitings_by_business_name(self.business_name)
+            waitings = self.dynamodb_client.get_today_waitings_by_business_name(self.business_name)
             print('Successfully get waitings: ' + str(waitings))
             response_body = {
                 "message": "Successfully get waitinglists",
