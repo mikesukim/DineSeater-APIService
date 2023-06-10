@@ -1,7 +1,7 @@
 import json
 import response_handler
 from dynamodb_client import DynamoDBClient
-from post_action_handler import PostActionHandler
+from post_handler import PostHandler
 from get_handler import GetHandler
 
 # Global variable to make singleton within a container.
@@ -25,7 +25,7 @@ def lambda_handler(event, context):
             return get_action_handler.handle_action()
         
         case 'POST':
-            post_action_handler = PostActionHandler(event, business_name, dynamodb_client)
+            post_action_handler = PostHandler(event, business_name, dynamodb_client)
             return post_action_handler.handle_action()       
          
         case _:

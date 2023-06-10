@@ -3,7 +3,7 @@ import response_handler
 
 from waiting_status import WaitingStatus
 
-class PostActionHandler:
+class PostHandler:
     def __init__(self, event, business_name, dynamodb_client):
         self.event = event
         self.business_name = business_name
