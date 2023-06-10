@@ -11,6 +11,7 @@ class GetHandler:
     def handle_action(self):
         try:
             # get waitinglist from dynamodb
+            # TODO: make sure the limited number of watitinglist that can be retrieved at once.
             waitings = self.dynamodb_client.get_today_waitings_by_business_name(self.business_name)
             print('Successfully get waitings: ' + str(waitings))
             response_body = {
