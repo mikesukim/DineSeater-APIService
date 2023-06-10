@@ -2,6 +2,8 @@ import boto3
 import uuid
 import datetime
 
+from waiting_status import WaitingStatus
+
 class WaitingTable:
     def __init__(self, table_name):
         self.table_name = table_name
@@ -41,7 +43,7 @@ class WaitingTable:
             'number_of_customers': int(number_of_customers),
             'detail_attribute': detail_attribute,
             'phone_number': str(phone_number),
-            'status': 'waiting',
+            'status': WaitingStatus.WAITING.value,
         }
         self.table.put_item(Item=item)
         return item
