@@ -19,6 +19,9 @@ class DynamoDBClient:
     
     def update_waiting(self, business_name, waiting_id, update_expression, expression_attribute_values):
         self.waiting_table.update_waiting(business_name, waiting_id, update_expression, expression_attribute_values)
+
+    def update_waiting_status(self, business_name, waiting_id, new_status):
+        self.waiting_table.update_waiting_status(business_name, waiting_id, new_status)
     
     def delete_waiting(self, business_name, waiting_id):
         self.waiting_table.delete_waiting(business_name, waiting_id)

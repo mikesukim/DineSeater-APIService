@@ -54,6 +54,22 @@ class WaitingTable:
             UpdateExpression=update_expression,
             ExpressionAttributeValues=expression_attribute_values
         )
+
+    def update_waiting_status(self, business_name, waiting_id, new_status):
+        update_expression = 'SET #statusAttr = :newStatus'
+        expression_attribute_values = {
+            ':newStatus': new_status
+        }
+        expression_attribute_names = {
+            '#statusAttr': 'status'
+        }
+        
+        self.table.update_item(
+            Key={'business_name': business_name, 'waiting_id': waiting_id},
+            UpdateExpression=update_expression,
+            ExpressionAttributeValues=expression_attribute_values,
+            ExpressionAttributeNames=expression_attribute_names
+        )
     
     def delete_waiting(self, business_name, waiting_id):
         self.table.delete_item(Key={'business_name': business_name, 'waiting_id': waiting_id})

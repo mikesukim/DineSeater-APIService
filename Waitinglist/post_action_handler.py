@@ -1,6 +1,8 @@
 import json
 import response_handler
 
+from waiting_status import WaitingStatus
+
 class PostActionHandler:
     def __init__(self, event, business_name, dynamodb_client):
         self.event = event
@@ -70,12 +72,12 @@ class PostActionHandler:
 
         # delete waiting
         self.dynamodb_client.delete_waiting(self.business_name, waiting_id)
-
         return response_handler.success({"message": "waiting deletion success " + waiting_id})
 
     def handle_notify_action(self):
         # TODO: Implement the logic for notifying customers from the waiting list
         print("Notify customer from waitinglist")
+        self.dynamodb_client.update_waiting_status(self.business_name, self.get_waiting_id(), WaitingStatus.TEXT_SENT.value)
         return response_handler.success({"message": "Notify action completed"})
 
     def get_number_of_customers(self):
