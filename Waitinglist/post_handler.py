@@ -18,6 +18,10 @@ class PostHandler:
                 return self.handle_remove_action()
             elif action == 'notify':
                 return self.handle_notify_action()
+            elif action == 'report_arrival':
+                return self.handle_report_arrival_action()
+            elif action == 'report_missed':
+                return self.handle_report_missed_action()
             else:
                 return response_handler.failure({"message": "Action not allowed"})
         except Exception as e:
@@ -79,6 +83,14 @@ class PostHandler:
         print("Notify customer from waitinglist")
         self.dynamodb_client.update_waiting_status(self.business_name, self.get_waiting_id(), WaitingStatus.TEXT_SENT.value)
         return response_handler.success({"message": "Notify action completed"})
+    
+    def handle_report_arrival_action(self):
+        self.dynamodb_client.update_waiting_status(self.business_name, self.get_waiting_id(), WaitingStatus.ARRIVED.value)
+        return response_handler.success({"message": "Report_arrival action completed"})
+    
+    def handle_report_missed_action(self):
+        self.dynamodb_client.update_waiting_status(self.business_name, self.get_waiting_id(), WaitingStatus.MISSED.value)
+        return response_handler.success({"message": "Report_missed action completed"})
 
     def get_number_of_customers(self):
         body = json.loads(self.event['body'])
