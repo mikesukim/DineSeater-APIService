@@ -24,6 +24,8 @@ aws configure
 # copy source code to /source_code
 sudo mkdir source_code
 cp -r lambda_function.py source_code/
+cp -r response_handler.py source_code/
+cp -r dineseater-gilsonapp-firebase-adminsdk-credentials.json source_code/
 cp -r .env source_code/
 cp -r .requirements.txt source_code/
 

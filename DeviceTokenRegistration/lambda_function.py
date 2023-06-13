@@ -35,7 +35,8 @@ def lambda_handler(event, context):
         print(error_message)
         return response_handler.failure({"message": "device_token name not found"})
         
-
+    # TODO : subscribe device_token to topic (business_name) 
+    return response_handler.success({"message": "device_token name found"})
         
         
 def get_business_name(event):
