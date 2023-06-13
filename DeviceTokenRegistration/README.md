@@ -19,14 +19,23 @@ python -m unittest discover
 aws configure
 ```
 
-3. Zip all files. (TODO : zip should also include dependencies)
+3. Zip all files.
 ```bash
-zip -r lambda_function.zip lambda_function.py tests
+# copy source code to /source_code
+sudo mkdir source_code
+cp -r lambda_function.py source_code/
+cp -r .env source_code/
+cp -r .requirements.txt source_code/
+
+# install dependencies to /source_code
+pip install -r requirements.txt -t source_code/
+
+# zip /source_code and save to upper directory
+cd source_code
+zip -r ../source_code.zip .
 ```
 
 4. Deploy the zip file
 ```bash
-aws lambda update-function-code \
-    --function-name DineSeater-<stage>-DeviceTokenRegistration \
-    --zip-file fileb://<path_to_zip_file>
+aws lambda update-function-code --function-name DineSeater-Test-DeviceTokenRegistration --zip-file fileb:///Users/michaelkim/Development/DineSeater/DineSeater-APIService/DeviceTokenRegistration/source_code.zip
 ```
