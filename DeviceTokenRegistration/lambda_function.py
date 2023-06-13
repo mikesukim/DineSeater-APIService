@@ -29,14 +29,14 @@ def lambda_handler(event, context):
         return response_handler.failure({"message": "Business name not found"})
         
     try:
-        get_device_token = get_device_token(event)
+        device_token = get_device_token(event)
     except Exception as e:
         error_message = 'Error getting device_token : ' + str(e)
         print(error_message)
         return response_handler.failure({"message": "device_token name not found"})
         
     # TODO : subscribe device_token to topic (business_name) 
-    return response_handler.success({"message": "device_token name found"})
+    return response_handler.success({"message": "device_token name found : " + device_token})
         
         
 def get_business_name(event):
@@ -53,8 +53,8 @@ def get_claim(event, claim_name):
             return claims[claim_name]
     return None
     
-def get_device_token(self):
-    body = json.loads(self.event['body'])
+def get_device_token(event):
+    body = json.loads(event['body'])
     device_token = body.get('device_token')
     if device_token is None:
         raise Exception('device_token not found')
