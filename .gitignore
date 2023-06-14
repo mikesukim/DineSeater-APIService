@@ -51,11 +51,11 @@ Thumbs.db
 # ZIP file
 *zip
 
-# Deploy file
-deploy.sh
-
 # Credentials 
 dineseater-gilsonapp-firebase-adminsdk-credentials.json
 
 # depdenencies
 source_code
+
+# python venv
+venv
