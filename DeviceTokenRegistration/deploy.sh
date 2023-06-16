@@ -20,13 +20,20 @@ source venv/bin/activate
 # Install dependencies
 pip3 install -r requirements.txt
 
-# Update Lambda function code
+# Zip the dependencies
 if [ -d "venv/lib/python$python_version/site-packages/" ]; then
   cd venv/lib/python"$python_version"/site-packages/ || exit 1
   zip -r ../../../../deploy.zip .
   cd ../../../../ || exit 1
 fi
-zip -g deploy.zip lambda_function.py response_handler.py dineseater-gilsonapp-firebase-adminsdk-credentials.json requirements.txt tests/ .env
+
+# Zip the source code
+if [ -d "source/" ]; then
+zip -r deploy.zip source
+fi
+
+# Zip the main Lambda function and the tests
+zip -g deploy.zip lambda_function.py requirements.txt .env 
 
 # Get the full file path of the deploy.zip file
 file_path=$(realpath deploy.zip)
@@ -34,3 +41,5 @@ file_path=$(realpath deploy.zip)
 # Update the Lambda function code on AWS
 aws lambda update-function-code --function-name DineSeater-$stage-DeviceTokenRegistration --zip-file "fileb://$file_path"
 
+# Remove the deploy.zip file
+rm deploy.zip

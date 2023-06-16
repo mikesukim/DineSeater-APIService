@@ -1,17 +1,7 @@
 import json
-import firebase_admin
 import os
-from firebase_admin import auth, messaging, credentials
-import response_handler
+from source import response_handler
 import boto3
-
-
-# Path to the service account credentials JSON file
-credentials_path = os.path.join(os.path.dirname(__file__), 'dineseater-gilsonapp-firebase-adminsdk-credentials.json')
-
-# Initialize Firebase Admin SDK with the service account credentials
-firebase_credentials = credentials.Certificate(credentials_path)
-firebase_admin.initialize_app(firebase_credentials)
 
 # Create an SNS client
 sns = boto3.client('sns')
