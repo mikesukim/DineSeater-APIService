@@ -1,9 +1,12 @@
 import json
 import os
+import boto3
+from dotenv import load_dotenv
 from source import response_handler
 from source import sns_client
 from source import event_analyzer
-import boto3
+
+load_dotenv()
 
 # Create an SNS client
 sns = boto3.client('sns')
@@ -34,9 +37,7 @@ def lambda_handler(event, context):
         print(error_message)
         return response_handler.failure({"message": "device_token name not found"})
 
-    # TODO: move to env variable
-    platform_application_arn = "arn:aws:sns:us-west-2:112014237129:app/GCM/DineSeater-Test-Flutter"
-
+    platform_application_arn = os.environ['PLATFORM_APPLICATION_ARN']
     is_device_registered = None
     try:
         is_device_registered = sns_client.check_device_token(device_token, platform_application_arn)
@@ -53,9 +54,7 @@ def lambda_handler(event, context):
     # Register device token to the application platform
     endpoint_arn = None
     try:
-        "TODO: move to env variable"
-        endpoint_arn = sns_client.register_device_token(device_token, 
-                                             platform_application_arn)
+        endpoint_arn = sns_client.register_device_token(device_token, platform_application_arn)
     except Exception as e:
         error_message = 'Error registering device token: ' + str(e)
         print(error_message)
@@ -63,10 +62,7 @@ def lambda_handler(event, context):
     
     # Check if topic exists for its business.
     topic_arn = None
-
-    "TODO: move to env variable"
-    stage = "Test"
-    topic_name = "DineSeater-" + stage + "-" + "Waitinglist" + "-" + business_name
+    topic_name = os.getenv('TOPIC_NAME_PREFIX') + business_name
 
     try:
         topic_arn = sns_client.get_topic_arn(topic_name)
