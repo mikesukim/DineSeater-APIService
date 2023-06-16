@@ -3,8 +3,8 @@ from unittest.mock import MagicMock
 
 from tests import test_variables
 
-from lambda_function import get_business_name
-from post_action_handler import PostActionHandler
+from event_analyzer import get_business_name
+from post_handler import PostHandler
 
 class TestLambdaFunction(unittest.TestCase):
     def test_existing_business_name(self):
@@ -23,7 +23,7 @@ class TestLambdaFunction(unittest.TestCase):
         event = test_variables.post_add_request_event
         business_name = 'gilson'
         dynamodb_client = MagicMock()
-        post_action_handler = PostActionHandler(event, business_name, dynamodb_client)
+        post_action_handler = PostHandler(event, business_name, dynamodb_client)
 
         expected_result = 'add'
         result = post_action_handler.get_action()
@@ -33,7 +33,7 @@ class TestLambdaFunction(unittest.TestCase):
         event = test_variables.post_without_body_request_event
         business_name = 'gilson'
         dynamodb_client = MagicMock()
-        post_action_handler = PostActionHandler(event, business_name, dynamodb_client)
+        post_action_handler = PostHandler(event, business_name, dynamodb_client)
 
         self.assertRaises(Exception, post_action_handler.get_action, event)
 
@@ -41,7 +41,7 @@ class TestLambdaFunction(unittest.TestCase):
         event = test_variables.post_add_request_event
         business_name = 'gilson'
         dynamodb_client = MagicMock()
-        post_action_handler = PostActionHandler(event, business_name, dynamodb_client)        
+        post_action_handler = PostHandler(event, business_name, dynamodb_client)        
         detail_attribute = post_action_handler.get_detail_attribute()
         
         expected_result = (True, True)
