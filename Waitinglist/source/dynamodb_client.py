@@ -1,4 +1,4 @@
-from waitinglist_table import WaitingTable
+from source.waitinglist_table import WaitingTable
 
 class DynamoDBClient:
     def __init__(self, table_name):

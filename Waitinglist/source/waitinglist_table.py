@@ -2,7 +2,7 @@ import boto3
 import uuid
 import datetime
 
-from waiting_status import WaitingStatus
+from source.waiting_status import WaitingStatus
 
 class WaitingTable:
     def __init__(self, table_name):

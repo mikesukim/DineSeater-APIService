@@ -1,7 +1,6 @@
 import json
-import response_handler
-
-from waiting_status import WaitingStatus
+from source import response_handler
+from source.waiting_status import WaitingStatus
 
 class PostHandler:
     def __init__(self, event, business_name, dynamodb_client):

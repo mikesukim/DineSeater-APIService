@@ -1,9 +1,9 @@
 import json
-import response_handler
-from dynamodb_client import DynamoDBClient
-from event_analyzer import get_business_name, get_claim
-from post_handler import PostHandler
-from get_handler import GetHandler
+import source.response_handler as response_handler
+from source.dynamodb_client import DynamoDBClient
+from source.event_analyzer import get_business_name
+from source.post_handler import PostHandler
+from source.get_handler import GetHandler
 
 # Global variable to make singleton within a container.
 dynamodb_client = DynamoDBClient('DineSeater-Waitinglist')

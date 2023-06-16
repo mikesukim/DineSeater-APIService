@@ -3,8 +3,8 @@ from unittest.mock import MagicMock
 
 from tests import test_variables
 
-from event_analyzer import get_business_name
-from post_handler import PostHandler
+from source.event_analyzer import get_business_name
+from source.post_handler import PostHandler
 
 class TestLambdaFunction(unittest.TestCase):
     def test_existing_business_name(self):

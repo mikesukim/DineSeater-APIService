@@ -1,6 +1,7 @@
 import json
-import response_handler
 import decimal
+
+from source import response_handler
 
 class GetHandler:
     def __init__(self, event, business_name, dynamodb_client):
