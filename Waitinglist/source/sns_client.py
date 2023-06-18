@@ -1,11 +1,13 @@
 import json
 
+from source.constant_variables import TOPIC_ARN_PREFIX
+
 class SNSClient:
     def __init__(self, sns_client):
         self.sns_client = sns_client
     
-    def publish_message_to_sns(self):
-        topic_arn = 'arn:aws:sns:us-west-2:112014237129:DineSeater-Test-Waitinglist-gilson'
+    def publish_message_to_sns(self, business_name):
+        topic_arn = TOPIC_ARN_PREFIX + business_name
         message = {
             "default": "Sample fallback message",
             "GCM": "{ \"notification\": { \"title\": \"This is title\", \"body\": \"this is body\" }, \"data\": { \"message\": \"Sample message for FCM endpoints\" } }",
