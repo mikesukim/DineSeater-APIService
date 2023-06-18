@@ -1,18 +1,16 @@
 import json
-import os
-import boto3
-from dotenv import load_dotenv
-from source import response_handler
-from source import sns_client
-from source import event_analyzer
 
-load_dotenv()
+import boto3
+from source import event_analyzer, response_handler, sns_client
+from source.constant_variables import (PLATFORM_APPLICATION_ARN,
+                                       TOPIC_NAME_PREFIX)
 
 # Create an SNS client
 sns = boto3.client('sns')
 sns_client = sns_client.SNSClient(sns)
 
 import json
+
 
 def lambda_handler(event, context):
     
@@ -37,7 +35,7 @@ def lambda_handler(event, context):
         print(error_message)
         return response_handler.failure({"message": "device_token name not found"})
 
-    platform_application_arn = os.environ['PLATFORM_APPLICATION_ARN']
+    platform_application_arn = PLATFORM_APPLICATION_ARN
     is_device_registered = None
     try:
         is_device_registered = sns_client.check_device_token(device_token, platform_application_arn)
@@ -62,7 +60,7 @@ def lambda_handler(event, context):
     
     # Check if topic exists for its business.
     topic_arn = None
-    topic_name = os.getenv('TOPIC_NAME_PREFIX') + business_name
+    topic_name = TOPIC_NAME_PREFIX + business_name
 
     try:
         topic_arn = sns_client.get_topic_arn(topic_name)
