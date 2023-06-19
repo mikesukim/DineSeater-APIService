@@ -3,11 +3,11 @@ from source import response_handler
 from source.waiting_status import WaitingStatus
 
 class PostHandler:
-    def __init__(self, event, business_name, dynamodb_client, sns_client):
+    def __init__(self, event, business_name, dynamodb_client, waitinglist_sns_publisher):
         self.event = event
         self.business_name = business_name
         self.dynamodb_client = dynamodb_client
-        self.sns_client = sns_client
+        self.waitinglist_sns_publisher = waitinglist_sns_publisher
 
     def handle_action(self):
         try:

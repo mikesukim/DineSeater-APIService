@@ -2,7 +2,7 @@ import json
 
 from source.constant_variables import TOPIC_ARN_PREFIX
 
-class SNSClient:
+class WaitinglistSNSPublisher:
     def __init__(self, sns_client):
         self.sns_client = sns_client
     

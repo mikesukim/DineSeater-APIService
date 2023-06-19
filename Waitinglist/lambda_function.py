@@ -2,16 +2,16 @@ import json
 
 import boto3
 import source.response_handler as response_handler
-from source import sns_client
 from source.constant_variables import TABLE_NAME_WAITINGLIST
 from source.dynamodb_client import DynamoDBClient
 from source.event_analyzer import get_business_name
 from source.get_handler import GetHandler
 from source.post_handler import PostHandler
+from source.waitinglist_sns_publisher import WaitinglistSNSPublisher
 
 # Global variable to make singleton within a container.
 dynamodb_client = DynamoDBClient(TABLE_NAME_WAITINGLIST)
-sns = boto3.client('sns')
+waitinglistSNSPublisher = WaitinglistSNSPublisher(boto3.client('sns'))
 
 def lambda_handler(event, context):
     # get business name from event (retrived from ID_TOKEN)
@@ -31,7 +31,7 @@ def lambda_handler(event, context):
             return get_action_handler.handle_action()
         
         case 'POST':
-            post_action_handler = PostHandler(event, business_name, dynamodb_client, sns_client.SNSClient(sns))
+            post_action_handler = PostHandler(event, business_name, dynamodb_client, waitinglistSNSPublisher)
             return post_action_handler.handle_action()       
          
         case _:
