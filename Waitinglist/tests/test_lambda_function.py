@@ -74,10 +74,24 @@ class TestLambdaFunction(unittest.TestCase):
             "phone_number": "2222222222",
             "status": "waiting"
         }
-        json_data = json.dumps(data)
-        sns_message = waitinglist_sns_publisher.create_fcm_message(title, body, json_data)
+        sns_message = waitinglist_sns_publisher.create_fcm_message(title, body, data)
         self.assertIsInstance(sns_message, str)
 
+    def test_waiting_sns_publisher_creating_fcm_message_for_status_update(self):
+        event = test_variables.post_add_request_event
+        business_name = 'gilson'
+        dynamodb_client = MagicMock()
+        waitinglist_sns_publisher = WaitinglistSNSPublisher(MagicMock())
+        post_action_handler = PostHandler(event, business_name, dynamodb_client, waitinglist_sns_publisher) 
+        
+        title = 'new customer is on line!'
+        body = 'New waiting is added.'
+        data = {
+            "waiting_id": "c8b52853-777a-4fc7-89b9-e2a814af31be",
+            "waiting_status": "missed"
+        }
+        sns_message = waitinglist_sns_publisher.create_fcm_message(title, body, data)
+        self.assertIsInstance(sns_message, str)
 
 if __name__ == '__main__':
     unittest.main()

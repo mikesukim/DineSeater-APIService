@@ -65,17 +65,18 @@ class PostHandler:
         return response_handler.success({"message": "waiting deletion success " + waiting_id})
 
     def handle_notify_action(self):
-        # TODO: Implement the logic for notifying customers from the waiting list
-        print("Notify customer from waitinglist")
         self.dynamodb_client.update_waiting_status(self.business_name, self.get_waiting_id(), WaitingStatus.TEXT_SENT.value)
+        self.waitinglist_sns_publisher.publish_waiting_status_update(self.business_name, self.get_waiting_id(), WaitingStatus.TEXT_SENT.value)
         return response_handler.success({"message": "Notify action completed"})
     
     def handle_report_arrival_action(self):
         self.dynamodb_client.update_waiting_status(self.business_name, self.get_waiting_id(), WaitingStatus.ARRIVED.value)
+        self.waitinglist_sns_publisher.publish_waiting_status_update(self.business_name, self.get_waiting_id(), WaitingStatus.ARRIVED.value)
         return response_handler.success({"message": "Report_arrival action completed"})
     
     def handle_report_missed_action(self):
         self.dynamodb_client.update_waiting_status(self.business_name, self.get_waiting_id(), WaitingStatus.MISSED.value)
+        self.waitinglist_sns_publisher.publish_waiting_status_update(self.business_name, self.get_waiting_id(), WaitingStatus.MISSED.value)
         return response_handler.success({"message": "Report_missed action completed"})
 
     def get_number_of_customers(self):
