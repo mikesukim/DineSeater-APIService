@@ -6,18 +6,14 @@ class WaitinglistSNSPublisher:
     def __init__(self, sns_client):
         self.sns_client = sns_client
     
-    def publish_message_to_sns(self, business_name):
+    def publish_new_waiting(self, business_name, new_waiting):
         topic_arn = TOPIC_ARN_PREFIX + business_name
-        message = {
-            "default": "Sample fallback message",
-            "GCM": "{ \"notification\": { \"title\": \"This is title\", \"body\": \"this is body\" }, \"data\": { \"message\": \"Sample message for FCM endpoints\" } }",
-        }
-        message_json = json.dumps(message)
+        message = self.create_fcm_message("new customer is on line!", "New waiting is added.", new_waiting)
         try:
             # Publish the message to the SNS topic
             response = self.sns_client.publish(
                 TopicArn=topic_arn,
-                Message=message_json,
+                Message=message,
                 MessageStructure='json'
             )
         except Exception as e:
@@ -27,3 +23,10 @@ class WaitinglistSNSPublisher:
                 'body': 'Error publishing message'
             }
         return response['MessageId']
+    
+    def create_fcm_message(self, title, body, data):
+        message = {
+            "default": "Sample fallback message",
+            "GCM": "{ \"notification\": { \"title\": \"" + title + "\", \"body\": \"" + body + "\"}, \"data\": " + json.dumps(data)  + "}",
+        }
+        return json.dumps(message)

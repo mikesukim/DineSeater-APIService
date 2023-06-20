@@ -28,20 +28,6 @@ class PostHandler:
             error_message = 'Error handling action: ' + str(e)
             print(error_message)
             return response_handler.bad_request({"message": error_message})
-
-    def get_business_name(self, event):
-        business_name = self.get_claim(event, 'business_name')
-        if business_name == None:
-            raise Exception('Business name not found')
-        return business_name.lower()
-
-    def get_claim(self, event, claim_name):
-        authorizer = event['requestContext'].get('authorizer')
-        if authorizer and 'claims' in authorizer:
-            claims = authorizer['claims']
-            if claim_name in claims:
-                return claims[claim_name]
-        return None
     
     def get_action(self):
         body = json.loads(self.event['body'])
@@ -67,7 +53,7 @@ class PostHandler:
         )
         print("Created new waiting: " + json.dumps(new_waiting))
 
-        # TODO: publish sns message
+        self.waitinglist_sns_publisher.publish_new_waiting(self.business_name, new_waiting)
 
         return response_handler.success({"message": "waiting creation success " + json.dumps(new_waiting)})
 
