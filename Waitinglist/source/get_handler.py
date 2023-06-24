@@ -1,6 +1,3 @@
-import json
-import decimal
-
 from source import response_handler
 
 class GetHandler:
@@ -18,14 +15,8 @@ class GetHandler:
             response_body = {
                 "message": "Successfully get waitinglists",
                 "waitings": waitings
-            }
-            # dynamodb returns number_of_customers as a Decimal type which is not JSON serializable. Convert it to int.
-            def decimal_default(obj):
-                if isinstance(obj, decimal.Decimal):
-                    return int(obj)
-                raise TypeError
-            
-            return response_handler.success(json.dumps(response_body, default=decimal_default))
+            }        
+            return response_handler.success(response_body)
         except Exception as e:
             error_message = 'Error while handling get request: ' + str(e)
             print(error_message)

@@ -1,11 +1,17 @@
 # Create a object that handles the response to the client
 import json
+import decimal
 from http import HTTPStatus
 
 def response(status_code: int, body: dict) -> dict:
+    # dynamodb returns number_of_customers as a Decimal type which is not JSON serializable. Convert it to int.
+    def decimal_default(obj):
+        if isinstance(obj, decimal.Decimal):
+            return int(obj)
+        raise TypeError
     return {
         'statusCode': status_code,
-        'body': json.dumps(body)
+        'body': json.dumps(body, default=decimal_default),
     }
 
 def success(body: dict) -> dict:

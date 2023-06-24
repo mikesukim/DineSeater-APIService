@@ -55,7 +55,12 @@ class PostHandler:
 
         self.waitinglist_sns_publisher.publish_new_waiting(self.business_name, new_waiting)
 
-        return response_handler.success({"message": "waiting creation success " + json.dumps(new_waiting)})
+        response_body = {
+            "message": "Successfully added new waiting",
+            "waiting": new_waiting
+        }
+
+        return response_handler.success(response_body)
 
     def handle_remove_action(self):
         waiting_id = self.get_waiting_id()
