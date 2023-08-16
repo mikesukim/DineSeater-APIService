@@ -27,7 +27,7 @@ class PostHandler:
         except Exception as e:
             error_message = 'Error handling action: ' + str(e)
             print(error_message)
-            return response_handler.bad_request({"message": error_message})
+            return response_handler.internal_server_error({"message": error_message})
     
     def get_action(self):
         body = json.loads(self.event['body'])
@@ -72,6 +72,7 @@ class PostHandler:
     def handle_notify_action(self):
         self.dynamodb_client.update_waiting_status(self.business_name, self.get_waiting_id(), WaitingStatus.TEXT_SENT.value)
         self.waitinglist_sns_publisher.publish_waiting_status_update(self.business_name, self.get_waiting_id(), WaitingStatus.TEXT_SENT.value)
+        # TODO : publish SMS message
         return response_handler.success({"message": "Notify action completed"})
     
     def handle_report_arrival_action(self):
