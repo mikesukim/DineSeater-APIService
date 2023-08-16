@@ -1,4 +1,5 @@
 import json
+from source.constant_variables import SMS_MESSAGE_NOTIFICATION, SMS_MESSAGE_WAITING_CREATION
 from source import response_handler
 from source.waiting_status import WaitingStatus
 
@@ -54,8 +55,7 @@ class PostHandler:
         print("Created new waiting: " + json.dumps(new_waiting))
 
         self.waitinglist_sns_publisher.publish_new_waiting(self.business_name, new_waiting)
-        
-        # TODO : send SMS to let customer know they are added to the waiting list.
+        self.waitinglist_sns_publisher.publish_sms(phone_number, SMS_MESSAGE_WAITING_CREATION)
         
         response_body = {
             "message": "Successfully added new waiting",
@@ -74,10 +74,9 @@ class PostHandler:
     def handle_notify_action(self):
         self.dynamodb_client.update_waiting_status(self.business_name, self.get_waiting_id(), WaitingStatus.TEXT_SENT.value)
         self.waitinglist_sns_publisher.publish_waiting_status_update(self.business_name, self.get_waiting_id(), WaitingStatus.TEXT_SENT.value)
-        phone_number = self.dynamodb_client.get_waiting_by_id(self.business_name, self.get_waiting_id()).get('phone_number')
+        phone_number_from_db = self.dynamodb_client.get_waiting_by_id(self.business_name, self.get_waiting_id()).get('phone_number')
         # TODO : phone number format check. raise error if sms is not available.
-        # TODO : officialize sms message.
-        self.waitinglist_sns_publisher.publish_sms(phone_number, "Your table is ready!")
+        self.waitinglist_sns_publisher.publish_sms(phone_number_from_db, SMS_MESSAGE_NOTIFICATION)
         return response_handler.success({"message": "Notify action completed"})
     
     def handle_report_arrival_action(self):

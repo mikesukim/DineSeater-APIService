@@ -18,3 +18,5 @@ match os.getenv('STAGE').upper():
         print("STAGE not set")
         raise Exception("STAGE not set")
     
+SMS_MESSAGE_WAITING_CREATION = "You are added to the waiting list. We will notify you when your table is ready."
+SMS_MESSAGE_NOTIFICATION = "Your table is ready. Please come to the restaurant within 10 minutes."
