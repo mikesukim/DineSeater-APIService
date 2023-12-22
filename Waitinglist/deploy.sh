@@ -17,29 +17,27 @@ fi
 python3 -m venv venv
 source venv/bin/activate
 
+ # Check if dist folder exists, if so, delete it and create new one
+if [ -d "dist" ]; then
+  rm -rf dist
+fi
+mkdir -p dist
+
 # Install dependencies
-pip3 install -r requirements.txt
+pip3 install --target ./dist -r requirements.txt
 
-# Zip the dependencies
-if [ -d "venv/lib/python$python_version/site-packages/" ]; then
-  cd venv/lib/python"$python_version"/site-packages/ || exit 1
-  zip -r ../../../../deploy.zip .
-  cd ../../../../ || exit 1
-fi
+# Zip sources
+cd dist
+zip -r ../dist.zip .
+cd ..
+zip -r dist.zip source
+zip -g dist.zip lambda_function.py .env
 
-# Zip the source code
-if [ -d "source/" ]; then
-zip -r deploy.zip source
-fi
-
-# Zip the main Lambda function and the tests
-zip -g deploy.zip lambda_function.py requirements.txt .env
-
-# Get the full file path of the deploy.zip file
-file_path=$(realpath deploy.zip)
+# Get the full file path of the dist.zip file
+file_path=$(realpath dist.zip)
 
 # Update the Lambda function code on AWS
 aws lambda update-function-code --function-name DineSeater-$stage-Waitinglist --zip-file "fileb://$file_path"
 
 # Remove the deploy.zip file
-rm deploy.zip
+rm dist.zip
