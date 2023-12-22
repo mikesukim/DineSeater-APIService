@@ -1,7 +1,7 @@
 # DineSeater APIService
-This readme doc is in progress.
-
 Please contact mikesungunkim@gmail.com for any inquiries.
+
+Please read each README.md file in each folder for more details & development.
 
 ## APIs
 ### POST DeviceTokenRegistration 
