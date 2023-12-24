@@ -80,10 +80,18 @@ def lambda_handler(event, context):
         logger.error(error_message)
         cloudwatch_metrics_emitter.emit_metric("DeviceTokenRegistrationAPIError", 1, "Count")
         return response_handler.failure({"message": "Error checking topic existence"})
-    
-    if topic_arn == None:
-        topic_arn = sns_client.create_topic(topic_name)
-        logger.info("create_topic : " + str(topic_arn))
+
+
+    try:
+        if topic_arn is None:
+            topic_arn = sns_client.create_topic(topic_name)
+            logger.info("create_topic : " + str(topic_arn))
+    except Exception as e:
+        error_message = 'Error creating topic: ' + str(e)
+        logger.error(error_message)
+        cloudwatch_metrics_emitter.emit_metric("DeviceTokenRegistrationAPIError", 1, "Count")
+        return response_handler.failure({"message": "Error creating topic"})
+
     
     # Subscribe the endpoint to the topic
     try:
