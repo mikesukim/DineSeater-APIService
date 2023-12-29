@@ -22,7 +22,6 @@ def lambda_handler(event, context):
     # get business name from event (retrieve from ID_TOKEN)
     logger.info("Waitinglist API started with event: " + json.dumps(event))
     try:
-        raise Exception("testing exception")
         business_name = get_business_name(event)
         match event['httpMethod']:
             case 'GET':
