@@ -37,7 +37,7 @@ class WaitinglistSNSPublisher:
         # There should be only one backslash at a time in the message. Having consecutive backslashes will not publish the message, without any error message.
         message = {
             "default": "Sample fallback message",
-            "GCM": "{ \"notification\": { \"title\": \"" + title + "\", \"body\": \"" + body + "\"}, \"data\": " + json.dumps(data, ensure_ascii=False)  + "}",
+            "GCM": "{ \"notification\": { \"title\": \"" + title + "\", \"body\": \"" + body + "\"}, \"data\": { \"waiting\" :" + json.dumps(data, ensure_ascii=False)  + "}}",
         }
         return json.dumps(message)
     
