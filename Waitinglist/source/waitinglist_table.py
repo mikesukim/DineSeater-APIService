@@ -49,6 +49,7 @@ class WaitingTable:
             'detail_attribute': detail_attribute,
             'phone_number': str(phone_number),
             'status': WaitingStatus.WAITING.value,
+            'date_text_sent' : None
         }
         self.table.put_item(Item=item)
         return item
@@ -61,13 +62,21 @@ class WaitingTable:
         )
 
     def update_waiting_status(self, business_name, waiting_id, new_status):
-        update_expression = 'SET #statusAttr = :newStatus'
+        current_time = datetime.datetime.now(tz=self.tz_timezone).strftime('%Y-%m-%d %H:%M:%S')
+        update_expression = 'SET #statusAttr = :newStatus, #lastModifiedAttr = :currentDateTime'
         expression_attribute_values = {
-            ':newStatus': new_status
+            ':newStatus': new_status,
+            ':currentDateTime': current_time
         }
         expression_attribute_names = {
-            '#statusAttr': 'status'
+            '#statusAttr': 'status',
+            '#lastModifiedAttr': 'last_modified'
         }
+
+        if new_status == WaitingStatus.TEXT_SENT.value:
+            update_expression += ', #dateTextSentAttr = :dateTextSent'
+            expression_attribute_values[':dateTextSent'] = current_time
+            expression_attribute_names['#dateTextSentAttr'] = 'date_text_sent'
         
         self.table.update_item(
             Key={'business_name': business_name, 'waiting_id': waiting_id},
