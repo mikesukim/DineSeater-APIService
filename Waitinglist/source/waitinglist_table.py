@@ -55,11 +55,14 @@ class WaitingTable:
         return item
     
     def update_waiting(self, business_name, waiting_id, update_expression, expression_attribute_values):
-        self.table.update_item(
+        result = self.table.update_item(
             Key={'business_name': business_name, 'waiting_id': waiting_id},
             UpdateExpression=update_expression,
-            ExpressionAttributeValues=expression_attribute_values
+            ExpressionAttributeValues=expression_attribute_values,
+            ReturnValues = 'ALL_NEW'
         )
+        attributes = result.get('Attributes')
+        return attributes if attributes else None
 
     def update_waiting_status(self, business_name, waiting_id, new_status):
         current_time = datetime.datetime.now(tz=self.tz_timezone).strftime('%Y-%m-%d %H:%M:%S')
@@ -78,12 +81,19 @@ class WaitingTable:
             expression_attribute_values[':dateTextSent'] = current_time
             expression_attribute_names['#dateTextSentAttr'] = 'date_text_sent'
         
-        self.table.update_item(
+        result = self.table.update_item(
             Key={'business_name': business_name, 'waiting_id': waiting_id},
             UpdateExpression=update_expression,
             ExpressionAttributeValues=expression_attribute_values,
-            ExpressionAttributeNames=expression_attribute_names
+            ExpressionAttributeNames=expression_attribute_names,
+            ReturnValues = 'ALL_NEW'
         )
+
+        attributes = result.get('Attributes')
+        # TODO : learn why Decimal type is returned from dynamodb
+        if attributes:
+            attributes['number_of_customers'] = int(attributes['number_of_customers'])
+        return attributes if attributes else None
     
     def delete_waiting(self, business_name, waiting_id):
         self.table.delete_item(Key={'business_name': business_name, 'waiting_id': waiting_id})

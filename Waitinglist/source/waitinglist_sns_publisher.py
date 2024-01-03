@@ -8,8 +8,9 @@ class WaitinglistSNSPublisher:
     
     def publish_new_waiting(self, business_name, new_waiting):
         topic_arn = TOPIC_ARN_PREFIX + business_name
+        print("sns is publishing new waiting: ", new_waiting)
+        print(new_waiting)
         message = self.create_fcm_message("new customer is on line!", "New waiting is added.", new_waiting)
-        
         # Publish the message to the SNS topic
         response = self.sns_client.publish(
             TopicArn=topic_arn,
@@ -19,10 +20,11 @@ class WaitinglistSNSPublisher:
         print("response from sns publish: ", response)
         return response['MessageId']
     
-    def publish_waiting_status_update(self, business_name, waiting_id, waiting_status):
+    def publish_waiting_status_update(self, business_name, updated_waiting, waiting_status):
         topic_arn = TOPIC_ARN_PREFIX + business_name
-        data = {"waiting_id": waiting_id, "waiting_status": waiting_status}
-        message = self.create_fcm_message("waiting status update!", "open the app for the latest update.", data)
+        print("sns is publishing waiting status update: ", waiting_status)
+        print(updated_waiting)
+        message = self.create_fcm_message("waiting status update!", "open the app for the latest update.", updated_waiting)
         
         # Publish the message to the SNS topic
         response = self.sns_client.publish(

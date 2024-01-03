@@ -74,22 +74,40 @@ class PostHandler:
         return response_handler.success({"message": "waiting deletion success " + waiting_id})
 
     def handle_notify_action(self):
-        self.dynamodb_client.update_waiting_status(self.business_name, self.get_waiting_id(), WaitingStatus.TEXT_SENT.value)
-        self.waitinglist_sns_publisher.publish_waiting_status_update(self.business_name, self.get_waiting_id(), WaitingStatus.TEXT_SENT.value)
+        new_waiting = self.dynamodb_client.update_waiting_status(self.business_name, self.get_waiting_id(), WaitingStatus.TEXT_SENT.value)
+        self.waitinglist_sns_publisher.publish_waiting_status_update(self.business_name, new_waiting, WaitingStatus.TEXT_SENT.value)
         phone_number_from_db = self.dynamodb_client.get_waiting_by_id(self.business_name, self.get_waiting_id()).get('phone_number')
         # TODO : phone number format check. raise error if sms is not available.
         self.waitinglist_sns_publisher.publish_sms(phone_number_from_db, SMS_MESSAGE_NOTIFICATION)
-        return response_handler.success({"message": "Notify action completed"})
+
+        response_body = {
+            "message": "Successfully updated waiting",
+            "waiting": new_waiting
+        }
+
+        return response_handler.success(response_body)
     
     def handle_report_arrival_action(self):
-        self.dynamodb_client.update_waiting_status(self.business_name, self.get_waiting_id(), WaitingStatus.ARRIVED.value)
-        self.waitinglist_sns_publisher.publish_waiting_status_update(self.business_name, self.get_waiting_id(), WaitingStatus.ARRIVED.value)
-        return response_handler.success({"message": "Report_arrival action completed"})
+        new_waiting = self.dynamodb_client.update_waiting_status(self.business_name, self.get_waiting_id(), WaitingStatus.ARRIVED.value)
+        self.waitinglist_sns_publisher.publish_waiting_status_update(self.business_name, new_waiting, WaitingStatus.ARRIVED.value)
+
+        response_body = {
+            "message": "Successfully updated waiting",
+            "waiting": new_waiting
+        }
+
+        return response_handler.success(response_body)
     
     def handle_report_missed_action(self):
-        self.dynamodb_client.update_waiting_status(self.business_name, self.get_waiting_id(), WaitingStatus.MISSED.value)
-        self.waitinglist_sns_publisher.publish_waiting_status_update(self.business_name, self.get_waiting_id(), WaitingStatus.MISSED.value)
-        return response_handler.success({"message": "Report_missed action completed"})
+        new_waiting = self.dynamodb_client.update_waiting_status(self.business_name, self.get_waiting_id(), WaitingStatus.MISSED.value)
+        self.waitinglist_sns_publisher.publish_waiting_status_update(self.business_name, new_waiting, WaitingStatus.MISSED.value)
+
+        response_body = {
+            "message": "Successfully updated waiting",
+            "waiting": new_waiting
+        }
+
+        return response_handler.success(response_body)
 
     def get_number_of_customers(self):
         body = json.loads(self.event['body'])
