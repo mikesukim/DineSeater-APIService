@@ -1,14 +1,17 @@
 import boto3
 import uuid
 import datetime
+import dateutil.tz
 
 from source.waiting_status import WaitingStatus
 
 class WaitingTable:
+
     def __init__(self, table_name):
         self.table_name = table_name
         self.dynamodb = boto3.resource('dynamodb')
         self.table = self.dynamodb.Table(table_name)
+        self.tz_timezone = dateutil.tz.gettz('America/Los_Angeles')
     
     def get_waiting_by_id(self, business_name, waiting_id):
         response = self.table.get_item(Key={'business_name': business_name, 'waiting_id': waiting_id})
@@ -22,7 +25,7 @@ class WaitingTable:
         return response.get('Items', [])
     
     def get_today_waitings(self, business_name):
-        current_date = datetime.datetime.now().strftime('%Y-%m-%d')
+        current_date = datetime.datetime.now(tz=self.tz_timezone).strftime('%Y-%m-%d')
         response = self.table.scan(
             FilterExpression='business_name = :name AND date_created BETWEEN :start_date AND :end_date',
             ExpressionAttributeValues={
@@ -35,7 +38,7 @@ class WaitingTable:
     
     def create_waiting(self, business_name, number_of_customers, detail_attribute, phone_number):
         waiting_id = str(uuid.uuid4())
-        current_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        current_time = datetime.datetime.now(tz=self.tz_timezone).strftime('%Y-%m-%d %H:%M:%S')
         item = {
             'business_name': business_name,
             'waiting_id': waiting_id,
