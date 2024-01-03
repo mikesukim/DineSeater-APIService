@@ -39,6 +39,7 @@ class PostHandler:
 
     def handle_add_action(self):
         number_of_customers = self.get_number_of_customers()
+        name = self.get_name()
         detail_attribute = self.get_detail_attribute()
         phone_number = self.get_phone_number()
 
@@ -48,6 +49,7 @@ class PostHandler:
         # Create new waiting
         new_waiting = self.dynamodb_client.create_waiting(
             self.business_name,
+            name,
             number_of_customers,
             detail_attribute,
             phone_number
@@ -95,6 +97,13 @@ class PostHandler:
         if number_of_customers is None:
             raise Exception('number_of_customers not found')
         return number_of_customers
+
+    def get_name(self):
+        body = json.loads(self.event['body'])
+        name = body.get('name')
+        if name is None:
+            raise Exception('name not found')
+        return name
 
     def get_detail_attribute(self):
         body = json.loads(self.event['body'])

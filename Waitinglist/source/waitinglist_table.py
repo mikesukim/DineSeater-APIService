@@ -36,11 +36,13 @@ class WaitingTable:
         )
         return response.get('Items', [])
     
-    def create_waiting(self, business_name, number_of_customers, detail_attribute, phone_number):
+    def create_waiting(self, business_name, name, number_of_customers, detail_attribute, phone_number):
         waiting_id = str(uuid.uuid4())
         current_time = datetime.datetime.now(tz=self.tz_timezone).strftime('%Y-%m-%d %H:%M:%S')
         item = {
             'business_name': business_name,
+            'name' : name,
+            'last_modified' : current_time,
             'waiting_id': waiting_id,
             'date_created': current_time,  # Example: Set the date_created attribute
             'number_of_customers': int(number_of_customers),
