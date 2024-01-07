@@ -23,6 +23,8 @@ class PostHandler:
                 return self.handle_report_arrival_action()
             elif action == 'report_missed':
                 return self.handle_report_missed_action()
+            elif action == 'report_back_initial_status':
+                return self.handle_report_back_initial_status_action()
             else:
                 return response_handler.failure({"message": "Action not allowed"})
         except Exception as e:
@@ -101,6 +103,17 @@ class PostHandler:
     def handle_report_missed_action(self):
         new_waiting = self.dynamodb_client.update_waiting_status(self.business_name, self.get_waiting_id(), WaitingStatus.MISSED.value)
         self.waitinglist_sns_publisher.publish_waiting_status_update(self.business_name, new_waiting, WaitingStatus.MISSED.value)
+
+        response_body = {
+            "message": "Successfully updated waiting",
+            "waiting": new_waiting
+        }
+
+        return response_handler.success(response_body)
+
+    def handle_report_back_initial_status_action(self):
+        new_waiting = self.dynamodb_client.update_waiting_status(self.business_name, self.get_waiting_id(), WaitingStatus.WAITING.value)
+        self.waitinglist_sns_publisher.publish_waiting_status_update(self.business_name, new_waiting, WaitingStatus.WAITING.value)
 
         response_body = {
             "message": "Successfully updated waiting",
