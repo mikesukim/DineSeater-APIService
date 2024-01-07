@@ -12,6 +12,7 @@ class WaitinglistSNSPublisher:
         print(new_waiting)
         message = self.create_fcm_message("new customer is on line!", "New waiting is added.", new_waiting)
         # Publish the message to the SNS topic
+        # TODO : add error handling, learn how how to handle fcm error at SNS level
         response = self.sns_client.publish(
             TopicArn=topic_arn,
             Message=message,
@@ -37,6 +38,7 @@ class WaitinglistSNSPublisher:
     
     def create_fcm_message(self, title, body, data):
         # There should be only one backslash at a time in the message. Having consecutive backslashes will not publish the message, without any error message.
+        # TODO : notification is sent silent all the time (to fix receiving notification issue when app is on background). Need to figure out how to send notification with badge & sounds
         message = {
             "default": "Sample fallback message",
             "GCM": "{ \"notification\": { \"content_available\" : true }, \"data\": { \"title\": \"" + title + "\", \"body\": \"" + body + "\", \"waiting\" :" + json.dumps(data, ensure_ascii=False)  + "}}",
