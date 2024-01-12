@@ -15,6 +15,8 @@ class PostHandler:
             action = self.get_action()
             if action == 'add':
                 return self.handle_add_action()
+            elif action == 'publish':
+                return self.handle_publish_action()
             elif action == 'remove':
                 return self.handle_remove_action()
             elif action == 'notify':
@@ -40,15 +42,13 @@ class PostHandler:
         return action.lower()
 
     def handle_add_action(self):
+        # create new waiting at db
         number_of_customers = self.get_number_of_customers()
         name = self.get_name()
         detail_attribute = self.get_detail_attribute()
         phone_number = self.get_phone_number()
-
         if self.business_name == 'gilson':
             table_type = self.get_table_type(detail_attribute)
-
-        # Create new waiting
         new_waiting = self.dynamodb_client.create_waiting(
             self.business_name,
             name,
@@ -58,20 +58,38 @@ class PostHandler:
         )
         print("Created new waiting: " + json.dumps(new_waiting))
 
-        sample_message = json.dumps(new_waiting)
-        print("SNS is about to publish notification")
-        notification_result = self.waitinglist_sns_publisher.publish_new_waiting(self.business_name, new_waiting)
-        print("SNS notification result: " + notification_result)
-        print("SNS is about to publish SMS: " + sample_message)
-        text_result = self.waitinglist_sns_publisher.publish_sms(phone_number, sample_message)
+        # send SMS
+        print("SNS is about to publish SMS")
+        # TODO : add customer name on text
+        text_result = self.waitinglist_sns_publisher.publish_sms(phone_number, SMS_MESSAGE_WAITING_CREATION)
         print("SNS SMS result: " + text_result)
-        
+
         response_body = {
             "message": "Successfully added new waiting",
             "waiting": new_waiting
         }
-
         return response_handler.success(response_body)
+
+    def handle_publish_action(self):
+        # send push notification
+        print("SNS is about to publish push notification")
+
+        # get waiting from body
+        body = json.loads(self.event['body'])
+        waiting = body.get('waiting')
+        if waiting is None:
+            raise Exception('waiting not found')
+
+        # publish push notification
+        print("SNS is about to publish notification")
+        notification_result = self.waitinglist_sns_publisher.publish_new_waiting(self.business_name, waiting)
+        print("SNS notification result: " + notification_result)
+
+        response_body = {
+            "message": "Successfully pushed notification"
+        }
+        return response_handler.success(response_body)
+
 
     def handle_remove_action(self):
         waiting_id = self.get_waiting_id()
@@ -81,58 +99,45 @@ class PostHandler:
         return response_handler.success({"message": "waiting deletion success " + waiting_id})
 
     def handle_notify_action(self):
-        new_waiting = self.dynamodb_client.update_waiting_status(self.business_name, self.get_waiting_id(), WaitingStatus.TEXT_SENT.value)
-        sample_message = json.dumps(new_waiting)
-        print("SNS is about to publish notification")
-        notification_result = self.waitinglist_sns_publisher.publish_waiting_status_update(self.business_name, new_waiting, WaitingStatus.TEXT_SENT.value)
-        print("SNS notification result: " + notification_result)
-        phone_number_from_db = self.dynamodb_client.get_waiting_by_id(self.business_name, self.get_waiting_id()).get('phone_number')
+        # send SMS first this time
+        phone_number_from_db = self.dynamodb_client.get_waiting_by_id(self.business_name, self.get_waiting_id()).get(
+            'phone_number')
         print("SNS is about to publish SMS: " + phone_number_from_db)
         # TODO : phone number format check. raise error if sms is not available.
-        text_reult = self.waitinglist_sns_publisher.publish_sms(phone_number_from_db, sample_message)
+        text_reult = self.waitinglist_sns_publisher.publish_sms(phone_number_from_db, SMS_MESSAGE_NOTIFICATION)
         print("SNS SMS result: " + text_reult)
+
+        # update waiting status at db
+        new_waiting = self.dynamodb_client.update_waiting_status(self.business_name, self.get_waiting_id(), WaitingStatus.TEXT_SENT.value)
 
         response_body = {
             "message": "Successfully updated waiting",
             "waiting": new_waiting
         }
-
         return response_handler.success(response_body)
     
     def handle_report_arrival_action(self):
         new_waiting = self.dynamodb_client.update_waiting_status(self.business_name, self.get_waiting_id(), WaitingStatus.ARRIVED.value)
-        print("SNS is about to publish notification: " + json.dumps(new_waiting))
-        notification_result = self.waitinglist_sns_publisher.publish_waiting_status_update(self.business_name, new_waiting, WaitingStatus.ARRIVED.value)
-        print("SNS notification result: " + notification_result)
         response_body = {
             "message": "Successfully updated waiting",
             "waiting": new_waiting
         }
-
         return response_handler.success(response_body)
     
     def handle_report_missed_action(self):
         new_waiting = self.dynamodb_client.update_waiting_status(self.business_name, self.get_waiting_id(), WaitingStatus.MISSED.value)
-        print("SNS is about to publish notification: " + json.dumps(new_waiting))
-        notification_result = self.waitinglist_sns_publisher.publish_waiting_status_update(self.business_name, new_waiting, WaitingStatus.MISSED.value)
-        print("SNS notification result: " + notification_result)
         response_body = {
             "message": "Successfully updated waiting",
             "waiting": new_waiting
         }
-
         return response_handler.success(response_body)
 
     def handle_report_back_initial_status_action(self):
         new_waiting = self.dynamodb_client.update_waiting_status(self.business_name, self.get_waiting_id(), WaitingStatus.WAITING.value)
-        print("SNS is about to publish notification: " + json.dumps(new_waiting))
-        notification_result = self.waitinglist_sns_publisher.publish_waiting_status_update(self.business_name, new_waiting, WaitingStatus.WAITING.value)
-        print("SNS notification result: " + notification_result)
         response_body = {
             "message": "Successfully updated waiting",
             "waiting": new_waiting
         }
-
         return response_handler.success(response_body)
 
     def get_number_of_customers(self):
