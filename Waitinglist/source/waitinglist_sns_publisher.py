@@ -41,7 +41,7 @@ class WaitinglistSNSPublisher:
         # TODO : notification is sent silent all the time (to fix receiving notification issue when app is on background). Need to figure out how to send notification with badge & sounds
         message = {
             "default": "Sample fallback message",
-            "GCM": "{ \"notification\": { \"content_available\" : true }, \"data\": { \"title\": \"" + title + "\", \"body\": \"" + body + "\", \"waiting\" :" + json.dumps(data, ensure_ascii=False)  + "}}",
+            "GCM": "{ \"notification\": { \"title\": \"" + title + "\", \"body\": \"" + body + "\"}, \"data\": { \"priority\": \"high\", \"waiting\" :" + json.dumps(data, ensure_ascii=False)  + "}}",
         }
         return json.dumps(message)
     
