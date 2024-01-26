@@ -26,6 +26,8 @@ class PostHandler:
                 return self.handle_report_arrival_action()
             elif action == 'report_missed':
                 return self.handle_report_missed_action()
+            elif action == 'report_cancelled':
+                return self.handle_report_cancelled_action()
             elif action == 'report_back_initial_status':
                 return self.handle_report_back_initial_status_action()
             else:
@@ -137,6 +139,15 @@ class PostHandler:
             "waiting": new_waiting
         }
         self.cloudwatch_metrics_emitter.emit_metric("WaitingReportMissedSuccess", 1, "Count")
+        return response_handler.success(response_body)
+
+    def handle_report_cancelled_action(self):
+        new_waiting = self.dynamodb_client.update_waiting_status(self.business_name, self.get_waiting_id(), WaitingStatus.CANCELLED.value)
+        response_body = {
+            "message": "Successfully updated waiting",
+            "waiting": new_waiting
+        }
+        self.cloudwatch_metrics_emitter.emit_metric("WaitingReportCancelledSuccess", 1, "Count")
         return response_handler.success(response_body)
 
     def handle_report_back_initial_status_action(self):

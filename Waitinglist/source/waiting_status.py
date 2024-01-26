@@ -4,3 +4,4 @@ class WaitingStatus(Enum):
     TEXT_SENT = 'text_sent'
     ARRIVED = 'arrived'
     MISSED = 'missed'
+    CANCELLED = 'cancelled'
