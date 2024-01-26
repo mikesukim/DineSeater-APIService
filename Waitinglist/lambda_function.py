@@ -25,11 +25,11 @@ def lambda_handler(event, context):
         business_name = get_business_name(event)
         match event['httpMethod']:
             case 'GET':
-                get_action_handler = GetHandler(event, business_name, dynamodb_client)
+                get_action_handler = GetHandler(event, business_name, dynamodb_client, cloudwatch_metrics_emitter)
                 return get_action_handler.handle_action()
 
             case 'POST':
-                post_action_handler = PostHandler(event, business_name, dynamodb_client, waitinglistSNSPublisher)
+                post_action_handler = PostHandler(event, business_name, dynamodb_client, waitinglistSNSPublisher, cloudwatch_metrics_emitter)
                 return post_action_handler.handle_action()
 
             case _:

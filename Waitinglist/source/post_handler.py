@@ -4,15 +4,16 @@ from source import response_handler
 from source.waiting_status import WaitingStatus
 
 class PostHandler:
-    def __init__(self, event, business_name, dynamodb_client, waitinglist_sns_publisher):
+    def __init__(self, event, business_name, dynamodb_client, waitinglist_sns_publisher, cloudwatch_metrics_emitter):
         self.event = event
         self.business_name = business_name
         self.dynamodb_client = dynamodb_client
         self.waitinglist_sns_publisher = waitinglist_sns_publisher
+        self.cloudwatch_metrics_emitter = cloudwatch_metrics_emitter
 
     def handle_action(self):
         try:
-            action = self.get_action()
+            action = self._get_action()
             if action == 'add':
                 return self.handle_add_action()
             elif action == 'publish':
@@ -34,7 +35,7 @@ class PostHandler:
             print(error_message)
             return response_handler.internal_server_error({"message": error_message})
     
-    def get_action(self):
+    def _get_action(self):
         body = json.loads(self.event['body'])
         action = body.get('action')
         if action is None:
@@ -68,6 +69,7 @@ class PostHandler:
             "message": "Successfully added new waiting",
             "waiting": new_waiting
         }
+        self.cloudwatch_metrics_emitter.emit_metric("WaitingAddSuccess", 1, "Count")
         return response_handler.success(response_body)
 
     def handle_publish_action(self):
@@ -88,6 +90,7 @@ class PostHandler:
         response_body = {
             "message": "Successfully pushed notification"
         }
+        self.cloudwatch_metrics_emitter.emit_metric("WaitingPublishSuccess", 1, "Count")
         return response_handler.success(response_body)
 
 
@@ -96,6 +99,7 @@ class PostHandler:
 
         # delete waiting
         self.dynamodb_client.delete_waiting(self.business_name, waiting_id)
+        self.cloudwatch_metrics_emitter.emit_metric("WaitingRemoveSuccess", 1, "Count")
         return response_handler.success({"message": "waiting deletion success " + waiting_id})
 
     def handle_notify_action(self):
@@ -114,6 +118,7 @@ class PostHandler:
             "message": "Successfully updated waiting",
             "waiting": new_waiting
         }
+        self.cloudwatch_metrics_emitter.emit_metric("WaitingNotifySuccess", 1, "Count")
         return response_handler.success(response_body)
     
     def handle_report_arrival_action(self):
@@ -122,6 +127,7 @@ class PostHandler:
             "message": "Successfully updated waiting",
             "waiting": new_waiting
         }
+        self.cloudwatch_metrics_emitter.emit_metric("WaitingReportArrivalSuccess", 1, "Count")
         return response_handler.success(response_body)
     
     def handle_report_missed_action(self):
@@ -130,6 +136,7 @@ class PostHandler:
             "message": "Successfully updated waiting",
             "waiting": new_waiting
         }
+        self.cloudwatch_metrics_emitter.emit_metric("WaitingReportMissedSuccess", 1, "Count")
         return response_handler.success(response_body)
 
     def handle_report_back_initial_status_action(self):
@@ -138,6 +145,7 @@ class PostHandler:
             "message": "Successfully updated waiting",
             "waiting": new_waiting
         }
+        self.cloudwatch_metrics_emitter.emit_metric("WaitingReportBackInitialStatusSuccess", 1, "Count")
         return response_handler.success(response_body)
 
     def get_number_of_customers(self):
