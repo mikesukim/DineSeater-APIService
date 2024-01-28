@@ -1,6 +1,6 @@
 import json
 
-from source.constant_variables import TOPIC_ARN_PREFIX
+from source.constant_variables import TOPIC_ARN_PREFIX,STAGE,TEST_PHONE_NUMBERS
 
 class WaitinglistSNSPublisher:
     def __init__(self, sns_client):
@@ -46,6 +46,12 @@ class WaitinglistSNSPublisher:
         return json.dumps(message)
     
     def publish_sms(self, phone_number, message):
+        # if stage is not prod, then check if phone number is in the whitelist. if not, then don't send sms
+        if STAGE != "PROD":
+            if phone_number not in TEST_PHONE_NUMBERS:
+                print("SMS is not sent at TEST stage. only sent to allowlisted phone numbers")
+                return "BYPASS_SMS_SENDING_AT_TEST_STAGE"
+
         response = self.sns_client.publish(
             PhoneNumber=phone_number,
             Message=message
