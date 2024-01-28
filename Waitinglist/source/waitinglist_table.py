@@ -27,6 +27,7 @@ class WaitingTable:
     def get_today_waitings(self, business_name):
         current_date = datetime.datetime.now(tz=self.tz_timezone).strftime('%Y-%m-%d')
         response = self.table.scan(
+            IndexName='date_created-index',
             FilterExpression='business_name = :name AND date_created BETWEEN :start_date AND :end_date',
             ExpressionAttributeValues={
                 ':name': business_name,
