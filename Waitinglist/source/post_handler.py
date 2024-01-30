@@ -1,5 +1,5 @@
 import json
-from source.constant_variables import SMS_MESSAGE_NOTIFICATION, SMS_MESSAGE_WAITING_CREATION
+from source.constant_variables import SMS_MESSAGE_TABLE_READY, SMS_MESSAGE_WAITING_CREATION
 from source import response_handler
 from source.waiting_status import WaitingStatus
 
@@ -16,11 +16,11 @@ class PostHandler:
             action = self._get_action()
             if action == 'add':
                 return self.handle_add_action()
-            elif action == 'publish':
+            elif action == 'publish': # For pushing notification
                 return self.handle_publish_action()
             elif action == 'remove':
                 return self.handle_remove_action()
-            elif action == 'notify':
+            elif action == 'notify': # For pushing SMS
                 return self.handle_notify_action()
             elif action == 'report_arrival':
                 return self.handle_report_arrival_action()
@@ -86,7 +86,7 @@ class PostHandler:
 
         # publish push notification
         print("SNS is about to publish notification")
-        notification_result = self.waitinglist_sns_publisher.publish_new_waiting(self.business_name, waiting)
+        notification_result = self.waitinglist_sns_publisher.publish_waiting(self.business_name, waiting)
         print("SNS notification result: " + notification_result)
 
         response_body = {
@@ -110,7 +110,7 @@ class PostHandler:
             'phone_number')
         print("SNS is about to publish SMS: " + phone_number_from_db)
         # TODO : phone number format check. raise error if sms is not available.
-        text_reult = self.waitinglist_sns_publisher.publish_sms(phone_number_from_db, SMS_MESSAGE_NOTIFICATION)
+        text_reult = self.waitinglist_sns_publisher.publish_sms(phone_number_from_db, SMS_MESSAGE_TABLE_READY)
         print("SNS SMS result: " + text_reult)
 
         # update waiting status at db
